@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistem Jemput Siswa (Google Sheets)</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; }
+        input, button { padding: 10px; font-size: 16px; margin-top: 10px; }
+        #daftarAntrean { background: #f4f4f4; padding: 15px; margin-top: 20px; border-radius: 8px;}
+        #status { color: green; font-style: italic; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Aplikasi Jemput Siswa</h2>
+    <div id="status">Menghubungkan ke Google Sheets...</div>
+    
+    <input type="text" id="nisInput" placeholder="Masukkan NIS">
+    <button id="btnPanggil" onclick="panggil()" disabled>Panggil Siswa</button>
+    
+    <h3>Daftar Antrean Panggilan:</h3>
+    <ul id="daftarAntrean"></ul>
+
+    <script>
+        // --- TARUH LINK CSV GOOGLE SHEETS ANDA DI BAWAH INI ---
+        const urlGoogleSheets = https://docs.google.com/spreadsheets/d/e/2PACX-1vQnDyG3NAgbwsdmq_T47f_iXMjBeOT4EXVLEhjwarsaWd-ZQtjprjoJUKh3yeau7LO-bgAZgLXivQKh/pubhtml;
+        
+        // Database siswa sekarang kosong, akan diisi otomatis dari Google Sheets
+        let dataSiswa = {}; 
+        let antrean = [];
+        let sedangBicara = false;
+
+        // Fungsi untuk mengambil data dari Google Sheets
+        async function ambilDataSiswa() {
+            try {
+                const response = await fetch(urlGoogleSheets);
+                const dataText = await response.text();
+                
+                // Memecah data berdasarkan baris (enter)
+                const baris = dataText.split('\n');
+                
+                // Mulai dari angka 1 untuk melewati baris judul (NIS, Nama, Kelas)
+                for (let i = 1; i < baris.length; i++) {
+                    let kolom = baris[i].split(','); // Memecah berdasarkan koma
+                    
+                    if (kolom.length >= 3) {
+                        let nis = kolom[0].trim();
+                        let nama = kolom[1].trim();
+                        let kelas = kolom[2].trim();
+                        
+                        // Menyimpan ke memori aplikasi
+                        dataSiswa[nis] = nama + ", dari " + kelas;
+                    }
+                }
+                
+                document.getElementById("status").innerText = "Data berhasil dimuat! Siap digunakan.";
+                document.getElementById("btnPanggil").disabled = false; // Aktifkan tombol
+            } catch (error) {
+                document.getElementById("status").innerText = "Gagal memuat data. Periksa link Google Sheets Anda.";
+                document.getElementById("status").style.color = "red";
+            }
+        }
+
+        // Jalankan fungsi ambil data saat aplikasi pertama kali dibuka
+        ambilDataSiswa();
+
+        // Fungsi memasukkan siswa ke antrean (Sama seperti sebelumnya)
+        function panggil() {
+            let nis = document.getElementById("nisInput").value;
+            let infoSiswa = dataSiswa[nis];
+
+            if (infoSiswa) {
+                // Kalimat yang akan diucapkan
+                let teks = "Panggilan untuk " + infoSiswa + ". Penjemput telah tiba.";
+                antrean.push(teks);
+                updateUIAntrean();
+                document.getElementById("nisInput").value = "";
+                prosesAntrean();
+            } else {
+                alert("NIS tidak ditemukan di database!");
+            }
+        }
+
+        // Fungsi memproses antrean dan membacakannya
+        function prosesAntrean() {
+            if (antrean.length > 0 && !sedangBicara) {
+                sedangBicara = true;
+                let teks = antrean[0]; 
+
+                let suara = new SpeechSynthesisUtterance(teks);
+                suara.lang = 'id-ID'; 
+                suara.rate = 0.9; 
+
+                suara.onend = function() {
+                    antrean.shift(); 
+                    sedangBicara = false;
+                    updateUIAntrean();
+                    prosesAntrean(); 
+                };
+
+                window.speechSynthesis.speak(suara);
+            }
+        }
+
+        // Memperbarui tampilan
+        function updateUIAntrean() {
+            let list = document.getElementById("daftarAntrean");
+            list.innerHTML = "";
+            antrean.forEach(a => {
+                let li = document.createElement("li");
+                li.innerText = a;
+                list.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
