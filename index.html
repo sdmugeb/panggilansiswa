@@ -2,112 +2,225 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Sistem Jemput Siswa (Google Sheets)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Panggilan Jemput Siswa</title>
+    <!-- Menggunakan font dari Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 500px; }
-        input, button { padding: 10px; font-size: 16px; margin-top: 10px; }
-        #daftarAntrean { background: #f4f4f4; padding: 15px; margin-top: 20px; border-radius: 8px;}
-        #status { color: green; font-style: italic; margin-bottom: 10px; }
+        /* Desain Tampilan (UI) */
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+            min-height: 100vh; margin: 0; display: flex;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .card {
+            background: white; width: 100%; max-width: 550px;
+            padding: 30px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;
+        }
+        h2 { color: #333; margin-top: 0; font-weight: 700; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+        
+        #status-box {
+            padding: 10px; border-radius: 8px; font-weight: 600; margin-bottom: 20px;
+            background: #fff3cd; color: #856404; font-size: 14px; border: 1px solid #ffeeba;
+        }
+        .status-sukses { background: #d4edda !important; color: #155724 !important; border-color: #c3e6cb !important; }
+        .status-gagal { background: #f8d7da !important; color: #721c24 !important; border-color: #f5c6cb !important; }
+
+        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; }
+        input {
+            width: 70%; padding: 15px; font-size: 18px; text-align: center;
+            border: 2px solid #ddd; border-radius: 10px; transition: 0.3s;
+        }
+        input:focus { border-color: #74ebd5; outline: none; box-shadow: 0 0 8px rgba(116, 235, 213, 0.4); }
+        button {
+            background: #4facfe; color: white; border: none; padding: 15px 25px;
+            font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover:not(:disabled) { background: #00f2fe; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,242,254,0.4); }
+        button:disabled { background: #cccccc; cursor: not-allowed; }
+
+        .queue-container { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 15px; }
+        h3 { margin-top: 0; color: #4facfe; font-size: 18px; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li {
+            background: white; padding: 12px 15px; margin-bottom: 10px;
+            border-radius: 8px; border-left: 5px solid #4facfe;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <h2>Aplikasi Jemput Siswa</h2>
-    <div id="status">Menghubungkan ke Google Sheets...</div>
-    
-    <input type="text" id="nisInput" placeholder="Masukkan NIS">
-    <button id="btnPanggil" onclick="panggil()" disabled>Panggil Siswa</button>
-    
-    <h3>Daftar Antrean Panggilan:</h3>
-    <ul id="daftarAntrean"></ul>
+
+    <div class="card">
+        <h2>📢 Sistem Pemanggil Siswa</h2>
+        <p class="subtitle">Ketik NIS siswa untuk memanggil otomatis</p>
+
+        <!-- Kotak Status Koneksi -->
+        <div id="status-box">🔄 Sedang menghubungkan ke Google Sheets...</div>
+        
+        <div class="input-group">
+            <input type="text" id="nisInput" placeholder="Contoh: 101" autocomplete="off">
+            <button id="btnPanggil" onclick="panggil()" disabled>Panggil</button>
+        </div>
+        
+        <div class="queue-container">
+            <h3>Daftar Antrean:</h3>
+            <ul id="daftarAntrean">
+                <li style="border-left-color: #ddd; color: #999;">Belum ada antrean...</li>
+            </ul>
+        </div>
+    </div>
 
     <script>
-        // --- TARUH LINK CSV GOOGLE SHEETS ANDA DI BAWAH INI ---
-        const urlGoogleSheets = https://docs.google.com/spreadsheets/d/e/2PACX-1vQnDyG3NAgbwsdmq_T47f_iXMjBeOT4EXVLEhjwarsaWd-ZQtjprjoJUKh3yeau7LO-bgAZgLXivQKh/pub?output=csv;
+        // =========================================================================
+        // WAJIB GANTI TEKS DI BAWAH INI DENGAN LINK GOOGLE SHEETS MILIK ANDA
+        // =========================================================================
+        const urlGoogleSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnDyG3NAgbwsdmq_T47f_iXMjBeOT4EXVLEhjwarsaWd-ZQtjprjoJUKh3yeau7LO-bgAZgLXivQKh/pub?gid=0&single=true&output=csv";
         
-        // Database siswa sekarang kosong, akan diisi otomatis dari Google Sheets
         let dataSiswa = {}; 
         let antrean = [];
-        let sedangBicara = false;
+        let sedangProses = false;
 
-        // Fungsi untuk mengambil data dari Google Sheets
+        // 1. FUNGSI MENGAMBIL DATA (Dengan Sistem Pengecekan Eror)
         async function ambilDataSiswa() {
+            const statusBox = document.getElementById("status-box");
+            
+            // Cek apakah link sudah diganti atau belum
+            if (urlGoogleSheets.includes("MASUKKAN_LINK_CSV")) {
+                statusBox.innerText = "❌ ERROR: Link Google Sheets belum diganti di dalam kode!";
+                statusBox.className = "status-gagal";
+                return;
+            }
+
             try {
                 const response = await fetch(urlGoogleSheets);
-                const dataText = await response.text();
+                if (!response.ok) throw new Error("Gagal mengunduh CSV");
                 
-                // Memecah data berdasarkan baris (enter)
+                const dataText = await response.text();
                 const baris = dataText.split('\n');
                 
-                // Mulai dari angka 1 untuk melewati baris judul (NIS, Nama, Kelas)
                 for (let i = 1; i < baris.length; i++) {
-                    let kolom = baris[i].split(','); // Memecah berdasarkan koma
-                    
+                    let kolom = baris[i].split(','); 
                     if (kolom.length >= 3) {
                         let nis = kolom[0].trim();
                         let nama = kolom[1].trim();
                         let kelas = kolom[2].trim();
-                        
-                        // Menyimpan ke memori aplikasi
-                        dataSiswa[nis] = nama + ", dari " + kelas;
+                        if(nis !== "") dataSiswa[nis] = nama + ", dari kelas " + kelas;
                     }
                 }
                 
-                document.getElementById("status").innerText = "Data berhasil dimuat! Siap digunakan.";
-                document.getElementById("btnPanggil").disabled = false; // Aktifkan tombol
+                statusBox.innerText = "✅ Tersambung! Database siap digunakan.";
+                statusBox.className = "status-sukses";
+                document.getElementById("btnPanggil").disabled = false;
             } catch (error) {
-                document.getElementById("status").innerText = "Gagal memuat data. Periksa link Google Sheets Anda.";
-                document.getElementById("status").style.color = "red";
+                statusBox.innerText = "❌ Gagal koneksi! Pastikan link benar dan internet aktif.";
+                statusBox.className = "status-gagal";
             }
         }
 
-        // Jalankan fungsi ambil data saat aplikasi pertama kali dibuka
+        // Panggil data saat halaman dimuat
         ambilDataSiswa();
 
-        // Fungsi memasukkan siswa ke antrean (Sama seperti sebelumnya)
+        // 2. FUNGSI MEMBUAT SUARA BEL "TING-NONG"
+        function mainkanBel() {
+            return new Promise((resolve) => {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new AudioContext();
+                    
+                    const mainkanNada = (frekuensi, waktuMulai, durasi) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sine'; // Suara jernih seperti bel
+                        osc.frequency.setValueAtTime(frekuensi, ctx.currentTime + waktuMulai);
+                        gain.gain.setValueAtTime(0.6, ctx.currentTime + waktuMulai);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + waktuMulai + durasi);
+                        osc.start(ctx.currentTime + waktuMulai);
+                        osc.stop(ctx.currentTime + waktuMulai + durasi);
+                    };
+
+                    // Nada "Ting" (tinggi) lalu "Nong" (rendah)
+                    mainkanNada(783.99, 0, 1.2); // G5
+                    mainkanNada(523.25, 0.6, 1.5); // C5
+                    
+                    // Tunggu 2 detik agar bel selesai sebelum robot berbicara
+                    setTimeout(resolve, 2000); 
+                } catch (e) {
+                    resolve(); // Jika browser tidak mendukung, langsung ngomong saja
+                }
+            });
+        }
+
+        // 3. FUNGSI MEMASUKKAN KE ANTREAN
         function panggil() {
-            let nis = document.getElementById("nisInput").value;
+            let inputElemen = document.getElementById("nisInput");
+            let nis = inputElemen.value.trim();
             let infoSiswa = dataSiswa[nis];
 
             if (infoSiswa) {
-                // Kalimat yang akan diucapkan
-                let teks = "Panggilan untuk " + infoSiswa + ". Penjemput telah tiba.";
+                let teks = "Panggilan ditujukan kepada, " + infoSiswa + ". Penjemput telah tiba. Terima kasih.";
                 antrean.push(teks);
                 updateUIAntrean();
-                document.getElementById("nisInput").value = "";
+                inputElemen.value = "";
+                inputElemen.focus(); // Kembalikan kursor ke kotak ketik
                 prosesAntrean();
             } else {
-                alert("NIS tidak ditemukan di database!");
+                alert("NIS " + nis + " tidak ditemukan!");
+                inputElemen.value = "";
             }
         }
 
-        // Fungsi memproses antrean dan membacakannya
-        function prosesAntrean() {
-            if (antrean.length > 0 && !sedangBicara) {
-                sedangBicara = true;
-                let teks = antrean[0]; 
+        // Jalankan fungsi panggil jika tombol Enter ditekan
+        document.getElementById("nisInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") panggil();
+        });
 
+        // 4. FUNGSI MEMPROSES ANTREAN & SUARA
+        async function prosesAntrean() {
+            if (antrean.length > 0 && !sedangProses) {
+                sedangProses = true;
+                
+                // Bunyikan bel dulu dan tunggu sampai selesai
+                await mainkanBel(); 
+
+                // Setelah bel selesai, baru robot membaca nama
+                let teks = antrean[0]; 
                 let suara = new SpeechSynthesisUtterance(teks);
                 suara.lang = 'id-ID'; 
-                suara.rate = 0.9; 
+                suara.rate = 0.85; // Sedikit diperlambat agar terdengar jelas
+                suara.pitch = 1.1; // Nada suara
 
                 suara.onend = function() {
-                    antrean.shift(); 
-                    sedangBicara = false;
+                    antrean.shift(); // Hapus dari daftar antrean
+                    sedangProses = false;
                     updateUIAntrean();
-                    prosesAntrean(); 
+                    prosesAntrean(); // Lanjut ke antrean berikutnya jika ada
                 };
 
                 window.speechSynthesis.speak(suara);
             }
         }
 
-        // Memperbarui tampilan
+        // 5. UPDATE TAMPILAN ANTREAN
         function updateUIAntrean() {
             let list = document.getElementById("daftarAntrean");
             list.innerHTML = "";
+            if(antrean.length === 0) {
+                list.innerHTML = '<li style="border-left-color: #ddd; color: #999;">Antrean kosong...</li>';
+                return;
+            }
             antrean.forEach(a => {
                 let li = document.createElement("li");
-                li.innerText = a;
+                // Memotong kalimat teks agar di layar hanya tampil "Panggilan untuk [Nama]..."
+                li.innerText = a.replace(". Penjemput telah tiba. Terima kasih.", "");
                 list.appendChild(li);
             });
         }
