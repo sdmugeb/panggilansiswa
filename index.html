@@ -3,88 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Panggilan Jemput Siswa PRO</title>
+    <title>Sistem Panggilan - SD Muhammadiyah 1 GKB</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f1f5f9;
+            --primary: #1e3a8a; /* Biru Dongker Elegan */
+            --primary-hover: #1e40af;
+            --accent: #3b82f6; 
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --danger: #ef4444;
-            --danger-hover: #dc2626;
             --success: #10b981;
+            --warning: #f59e0b;
         }
 
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         
         body { 
-            background-color: var(--bg-color);
+            /* Gradasi latar belakang yang elegan */
+            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 50%, #dbeafe 100%);
             min-height: 100vh; display: flex;
             justify-content: center; align-items: center; padding: 20px;
         }
 
         .card {
-            background: var(--card-bg); width: 100%; max-width: 700px;
-            padding: 35px; border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03);
+            background: var(--card-bg); width: 100%; max-width: 750px;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.04);
         }
-
-        .header-title { display: flex; align-items: center; gap: 12px; color: var(--text-main); font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .header-title i { color: var(--primary); font-size: 28px; }
-        .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
         
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 30px 35px; color: white; text-align: center;
+        }
+        .school-name { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
+        .school-subtitle { font-size: 13px; font-weight: 400; opacity: 0.9; }
+
+        .card-body { padding: 35px; }
+
         #status-box {
             display: flex; align-items: center; gap: 10px;
             padding: 12px 15px; border-radius: 8px; font-weight: 500; margin-bottom: 25px;
             font-size: 13px; border: 1px solid var(--border); background: #f8fafc; color: var(--text-muted);
         }
         .status-sukses { background: #ecfdf5 !important; color: var(--success) !important; border-color: #a7f3d0 !important; }
-        .status-sukses i { color: var(--success); }
 
-        .input-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
-        
+        .input-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .input-box { position: relative; display: flex; flex-direction: column; gap: 8px; }
         .input-box label { font-size: 13px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
         
         .input-wrapper { display: flex; gap: 8px; position: relative; }
         .input-wrapper input {
             width: 100%; padding: 12px 15px; font-size: 15px;
-            border: 1px solid var(--border); border-radius: 8px; transition: 0.2s;
-            background: #f8fafc;
+            border: 1px solid var(--border); border-radius: 8px; transition: 0.2s; background: #f8fafc;
         }
-        .input-wrapper input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .input-wrapper input:focus { border-color: var(--accent); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
-        .btn-panggil {
-            background: var(--primary); color: white; border: none; padding: 0 20px;
-            border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-weight: 600;
-        }
-        .btn-panggil:hover:not(:disabled) { background: var(--primary-hover); }
-        .btn-panggil:disabled { background: #cbd5e1; cursor: not-allowed; }
-
-        #searchResults {
+        /* Dropdown Hasil Pencarian (NIS & Nama) */
+        .search-results {
             position: absolute; top: 100%; left: 0; right: 0; margin-top: 5px;
             background: white; border: 1px solid var(--border); border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; max-height: 250px; overflow-y: auto;
-            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10; max-height: 220px; overflow-y: auto; display: none;
         }
         .search-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 15px; border-bottom: 1px solid var(--border); transition: 0.2s;
         }
         .search-item:last-child { border-bottom: none; }
-        .search-item:hover { background: #f1f5f9; }
-        .search-info { display: flex; flex-direction: column; }
+        .search-item:hover { background: #f1f5f9; cursor: pointer; }
+        .search-info { display: flex; flex-direction: column; pointer-events: none;}
         .search-nama { font-weight: 600; font-size: 14px; color: var(--text-main); }
         .search-detail { font-size: 12px; color: var(--text-muted); }
-        .btn-add { background: #e0e7ff; color: var(--primary); border: none; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; }
-        .btn-add:hover { background: var(--primary); color: white; }
+        .btn-add { background: #e0e7ff; color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; pointer-events: none; }
+
+        /* Tombol Pengumuman Khusus */
+        .pengumuman-section { margin-bottom: 25px; border: 1px solid var(--border); padding: 15px; border-radius: 12px; background: #fafafa;}
+        .pengumuman-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .pengumuman-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .btn-pengumuman {
+            background: white; border: 1px solid var(--border); color: var(--text-main);
+            padding: 10px; font-size: 12px; font-weight: 500; border-radius: 8px; cursor: pointer;
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .btn-pengumuman i { font-size: 20px; color: var(--accent); }
+        .btn-pengumuman:hover { border-color: var(--accent); background: #eff6ff; }
 
         .btn-stop {
             width: 100%; background: #fee2e2; color: var(--danger); border: 1px solid #fecaca;
@@ -94,98 +101,133 @@
         .btn-stop:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
         .container-bawah { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .box-list { border: 1px solid var(--border); border-radius: 12px; height: 320px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column;}
+        .box-list { border: 1px solid var(--border); border-radius: 12px; height: 300px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column;}
         .box-header { 
             padding: 15px; border-bottom: 1px solid var(--border); background: white;
             position: sticky; top: 0; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--text-main);
         }
-        
         ul { list-style: none; padding: 10px; }
-        li {
-            background: white; padding: 12px; margin-bottom: 8px;
-            border-radius: 8px; border: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .li-antrean { border-left: 4px solid var(--primary); }
+        li { background: white; padding: 12px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .li-antrean { border-left: 4px solid var(--accent); }
         .li-riwayat { border-left: 4px solid var(--success); opacity: 0.8; }
-        
         .info-siswa { display: flex; flex-direction: column; flex: 1; margin-right: 10px; }
         .nama-siswa { font-weight: 600; font-size: 13px; color: var(--text-main); }
         .detail-siswa { font-size: 11px; color: var(--text-muted); margin-top: 2px;}
-        
         .btn-batal { background: transparent; color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
         .btn-batal:hover { background: var(--danger); color: white; }
 
         #toast {
             visibility: hidden; min-width: 250px; background-color: var(--text-main); color: white;
-            text-align: center; border-radius: 8px; padding: 15px; position: fixed;
-            z-index: 100; left: 50%; bottom: 30px; transform: translateX(-50%);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s;
-            font-weight: 500; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            text-align: center; border-radius: 8px; padding: 15px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s; font-weight: 500; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         #toast.show { visibility: visible; opacity: 1; }
+
+        /* Modal Peringatan NIS Ganda */
+        #modal-warning {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-content i { font-size: 40px; color: var(--warning); margin-bottom: 15px; }
+        .modal-content h3 { color: var(--text-main); margin-bottom: 10px; }
+        .modal-content p { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: left; background: #f8fafc; padding: 10px; border-radius: 8px; max-height: 150px; overflow-y: auto;}
+        .btn-tutup-modal { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
         
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        @media (max-width: 600px) {
+        @media (max-width: 650px) {
             .input-section { grid-template-columns: 1fr; gap: 15px; }
             .container-bawah { grid-template-columns: 1fr; }
-            .box-list { height: 250px; }
+            .pengumuman-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="header-title">
-            <i class="ph-fill ph-speaker-hifi"></i> Sistem Panggilan Siswa
-        </div>
-        <p class="subtitle">Modul otomatisasi penjemputan dengan output suara terintegrasi</p>
-
-        <div id="status-box">
-            <i class="ph ph-spinner ph-spin"></i> Menghubungkan ke Database Sheets...
+        <div class="card-header">
+            <h2 class="school-name">SD Muhammadiyah 1 GKB</h2>
+            <div class="school-subtitle">Sistem Panggilan Jemput Siswa Otomatis</div>
         </div>
         
-        <div class="input-section">
-            <div class="input-box">
-                <label><i class="ph ph-identification-card"></i> Panggil via NIS</label>
-                <div class="input-wrapper">
-                    <input type="text" id="nisInput" placeholder="Ketik NIS..." autocomplete="off">
-                    <button class="btn-panggil" id="btnPanggil" onclick="panggil(document.getElementById('nisInput').value)" disabled>
-                        <i class="ph-bold ph-megaphone"></i>
+        <div class="card-body">
+            <div id="status-box">
+                <i class="ph ph-spinner ph-spin"></i> Menghubungkan ke Database Sheets...
+            </div>
+            
+            <div class="input-section">
+                <!-- Pencarian NIS -->
+                <div class="input-box">
+                    <label><i class="ph-fill ph-identification-card"></i> Panggil via NIS</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="nisInput" placeholder="Ketik NIS..." autocomplete="off">
+                        <div id="nisResults" class="search-results"></div>
+                    </div>
+                </div>
+
+                <!-- Pencarian Nama -->
+                <div class="input-box">
+                    <label><i class="ph-fill ph-user-list"></i> Cari Nama Siswa</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="searchInput" placeholder="Ketik Nama Siswa..." autocomplete="off">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Pengumuman Khusus -->
+            <div class="pengumuman-section">
+                <div class="pengumuman-title"><i class="ph-fill ph-megaphone"></i> Pengumuman Khusus</div>
+                <div class="pengumuman-grid">
+                    <button class="btn-pengumuman" onclick="panggilPengumuman('Pengumuman. Kepada seluruh siswa yang telah selesai mengikuti kegiatan OST, dimohon untuk segera berkumpul di depan kantor kesekretariatan. Terima kasih.', 'Pengumuman OST')">
+                        <i class="ph-fill ph-users-three"></i> Siswa OST
+                    </button>
+                    <button class="btn-pengumuman" onclick="panggilPengumuman('Pengumuman. Dikarenakan cuaca sedang hujan, dimohon kepada seluruh siswa untuk berhati-hati dan tidak berlarian di area koridor sekolah karena lantai yang licin. Terima kasih.', 'Peringatan Hujan')">
+                        <i class="ph-fill ph-cloud-rain"></i> Awas Hujan
+                    </button>
+                    <button class="btn-pengumuman" onclick="panggilPengumuman('Pengumuman. Dihimbau kepada seluruh siswa untuk senantiasa menjaga kebersihan lingkungan SD Muhammadiyah 1 GKB. Pastikan membuang sampah pada tempat yang telah disediakan. Terima kasih.', 'Imbauan Kebersihan')">
+                        <i class="ph-fill ph-trash"></i> Buang Sampah
+                    </button>
+                    <button class="btn-pengumuman" onclick="panggilPengumuman('Pengumuman ditujukan kepada Bapak dan Ibu wali siswa yang sedang menjemput. Demi kesehatan anak-anak kita dan menjaga kualitas udara, mohon berkenan untuk mematikan mesin kendaraan Anda selama menunggu di area sekolah. Terima kasih atas kerja samanya.', 'Matikan Kendaraan')">
+                        <i class="ph-fill ph-engine"></i> Matikan Mesin
                     </button>
                 </div>
             </div>
-
-            <div class="input-box">
-                <label><i class="ph ph-magnifying-glass"></i> Cari Data Siswa</label>
-                <div class="input-wrapper">
-                    <!-- Placeholder diubah menjadi khusus nama -->
-                    <input type="text" id="searchInput" placeholder="Ketik Nama Siswa..." autocomplete="off">
-                    <div id="searchResults"></div>
+            
+            <button class="btn-stop" onclick="hentikanSuara()">
+                <i class="ph-fill ph-stop-circle"></i> Hentikan Suara Saat Ini
+            </button>
+            
+            <div class="container-bawah">
+                <div class="box-list">
+                    <div class="box-header"><i class="ph-fill ph-list-numbers" style="color: var(--accent);"></i> Daftar Antrean</div>
+                    <ul id="daftarAntrean"><li style="color: #999; justify-content:center; font-size:13px;">Antrean kosong</li></ul>
                 </div>
-            </div>
-        </div>
-        
-        <button class="btn-stop" onclick="hentikanSuara()">
-            <i class="ph-fill ph-stop-circle"></i> Hentikan Suara Saat Ini
-        </button>
-        
-        <div class="container-bawah">
-            <div class="box-list">
-                <div class="box-header"><i class="ph-fill ph-list-numbers" style="color: var(--primary);"></i> Daftar Antrean</div>
-                <ul id="daftarAntrean"><li style="color: #999; justify-content:center; font-size:13px;">Antrean kosong</li></ul>
-            </div>
-            <div class="box-list">
-                <div class="box-header"><i class="ph-fill ph-clock-counter-clockwise" style="color: var(--success);"></i> Riwayat Panggilan</div>
-                <ul id="daftarRiwayat"><li style="color: #999; justify-content:center; font-size:13px;">Belum ada riwayat</li></ul>
+                <div class="box-list">
+                    <div class="box-header"><i class="ph-fill ph-clock-counter-clockwise" style="color: var(--success);"></i> Riwayat Panggilan</div>
+                    <ul id="daftarRiwayat"><li style="color: #999; justify-content:center; font-size:13px;">Belum ada riwayat</li></ul>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Toast & Modal -->
     <div id="toast"><i class="ph-fill ph-info"></i> <span id="toast-msg">Notifikasi</span></div>
+    
+    <div id="modal-warning">
+        <div class="modal-content">
+            <i class="ph-fill ph-warning-circle"></i>
+            <h3>Peringatan Data Ganda</h3>
+            <div style="font-size: 13px; margin-bottom: 10px;">Ditemukan NIS yang sama digunakan oleh siswa yang berbeda di Spreadsheet. Harap segera perbaiki data Anda:</div>
+            <p id="modal-warning-text"></p>
+            <button class="btn-tutup-modal" onclick="document.getElementById('modal-warning').style.display='none'">Saya Mengerti</button>
+        </div>
+    </div>
 
     <script>
         const urlGoogleSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnDyG3NAgbwsdmq_T47f_iXMjBeOT4EXVLEhjwarsaWd-ZQtjprjoJUKh3yeau7LO-bgAZgLXivQKh/pub?gid=0&single=true&output=csv";
@@ -210,6 +252,8 @@
 
         async function ambilDataSiswa() {
             const statusBox = document.getElementById("status-box");
+            let warningGanda = [];
+            
             try {
                 const response = await fetch(urlGoogleSheets);
                 if (!response.ok) throw new Error("Gagal");
@@ -224,13 +268,22 @@
                         let kelas = kolom[2].trim();
                         
                         if(nis !== "") {
+                            // Cek jika NIS sudah ada tapi namanya beda (Data ganda/konflik)
+                            if(dataSiswa[nis] && dataSiswa[nis].nama.toLowerCase() !== nama.toLowerCase()) {
+                                warningGanda.push(`&bull; NIS <b>${nis}</b>: dipakai oleh <b>${dataSiswa[nis].nama}</b> & <b>${nama}</b>`);
+                            }
                             dataSiswa[nis] = { nama: nama, kelas: kelas };
                         }
                     }
                 }
                 statusBox.innerHTML = `<i class="ph-fill ph-check-circle"></i> Database Terhubung (${Object.keys(dataSiswa).length} Data)`;
                 statusBox.className = "status-sukses";
-                document.getElementById("btnPanggil").disabled = false;
+                
+                // Jika ada data ganda, tampilkan pop up modal
+                if(warningGanda.length > 0) {
+                    document.getElementById('modal-warning-text').innerHTML = warningGanda.join('<br><br>');
+                    document.getElementById('modal-warning').style.display = 'flex';
+                }
                 
                 daftarSuara = window.speechSynthesis.getVoices();
             } catch (error) {
@@ -240,52 +293,91 @@
         }
         ambilDataSiswa();
 
-        document.getElementById("searchInput").addEventListener("input", function() {
-            let keyword = this.value.toLowerCase().trim();
-            let resultsDiv = document.getElementById("searchResults");
-            resultsDiv.innerHTML = "";
-            
-            if (keyword.length < 2) {
-                resultsDiv.style.display = "none";
-                return;
-            }
-            
-            // Logika pencarian hanya berdasarkan nama siswa
-            let matched = Object.entries(dataSiswa).filter(([nis, data]) => {
-                return data.nama.toLowerCase().includes(keyword);
-            });
-
-            if (matched.length > 0) {
-                resultsDiv.style.display = "block";
-                matched.slice(0, 10).forEach(([nis, data]) => {
-                    let div = document.createElement("div");
-                    div.className = "search-item";
-                    div.innerHTML = `
-                        <div class="search-info">
-                            <span class="search-nama">${data.nama}</span>
-                            <span class="search-detail">NIS: ${nis} &bull; ${data.kelas}</span>
-                        </div>
-                        <button class="btn-add" onclick="panggilDariPencarian('${nis}')" title="Tambahkan ke antrean">
-                            <i class="ph-bold ph-plus"></i>
-                        </button>`;
-                    resultsDiv.appendChild(div);
+        // LOGIKA PENCARIAN (Bisa dipakai untuk NIS dan Nama)
+        function setupPencarian(inputId, resultsId, tipePencarian) {
+            document.getElementById(inputId).addEventListener("input", function() {
+                let keyword = this.value.toLowerCase().trim();
+                let resultsDiv = document.getElementById(resultsId);
+                resultsDiv.innerHTML = "";
+                
+                if (keyword.length < 1) {
+                    resultsDiv.style.display = "none";
+                    return;
+                }
+                
+                let matched = Object.entries(dataSiswa).filter(([nis, data]) => {
+                    if(tipePencarian === 'nis') return nis.includes(keyword);
+                    if(tipePencarian === 'nama') return data.nama.toLowerCase().includes(keyword);
                 });
-            } else {
-                resultsDiv.style.display = "block";
-                resultsDiv.innerHTML = `<div class="search-item"><div class="search-info"><span class="search-detail">Data tidak ditemukan</span></div></div>`;
-            }
-        });
 
+                if (matched.length > 0) {
+                    resultsDiv.style.display = "block";
+                    matched.slice(0, 10).forEach(([nis, data]) => {
+                        let div = document.createElement("div");
+                        div.className = "search-item";
+                        div.onclick = function() {
+                            document.getElementById(inputId).value = "";
+                            resultsDiv.style.display = "none";
+                            masukkanKeAntrean(nis);
+                        };
+                        div.innerHTML = `
+                            <div class="search-info">
+                                <span class="search-nama">${data.nama}</span>
+                                <span class="search-detail">NIS: ${nis} &bull; ${data.kelas}</span>
+                            </div>
+                            <div class="btn-add"><i class="ph-bold ph-plus"></i></div>`;
+                        resultsDiv.appendChild(div);
+                    });
+                } else {
+                    resultsDiv.style.display = "block";
+                    resultsDiv.innerHTML = `<div class="search-item"><div class="search-info"><span class="search-detail">Data tidak ditemukan</span></div></div>`;
+                }
+            });
+        }
+
+        setupPencarian("nisInput", "nisResults", "nis");
+        setupPencarian("searchInput", "searchResults", "nama");
+
+        // Menutup dropdown jika klik di luar
         document.addEventListener('click', function(e) {
-            if (!document.getElementById("searchInput").contains(e.target)) {
-                document.getElementById("searchResults").style.display = "none";
-            }
+            if (!document.getElementById("nisInput").contains(e.target)) document.getElementById("nisResults").style.display = "none";
+            if (!document.getElementById("searchInput").contains(e.target)) document.getElementById("searchResults").style.display = "none";
         });
 
-        function panggilDariPencarian(nis) {
-            document.getElementById("searchInput").value = "";
-            document.getElementById("searchResults").style.display = "none";
-            panggil(nis);
+        // FUNGSI MEMASUKKAN SISWA KE ANTREAN
+        function masukkanKeAntrean(nisValue) {
+            let nis = nisValue.trim();
+            let siswa = dataSiswa[nis];
+            
+            if (siswa) {
+                let teksBicara = "Panggilan kepada, " + siswa.nama + ", dari " + siswa.kelas + ". ditunggu di depan kantor sekretariatan.";
+                antrean.push({ nis: nis, nama: siswa.nama, kelas: siswa.kelas, suara: teksBicara });
+                updateUIAntrean();
+                tampilkanNotif(`${siswa.nama} masuk antrean`, "ph-check-circle");
+                prosesAntrean();
+            }
+        }
+
+        // FUNGSI MEMASUKKAN PENGUMUMAN KHUSUS KE ANTREAN
+        function panggilPengumuman(teks, label) {
+            antrean.push({ nis: "-", nama: label, kelas: "Pengumuman", suara: teks });
+            updateUIAntrean();
+            tampilkanNotif(`${label} ditambahkan`, "ph-megaphone");
+            prosesAntrean();
+        }
+
+        function batalkanAntrean(index) {
+            antrean.splice(index, 1);
+            tampilkanNotif("Dibatalkan", "ph-trash");
+            updateUIAntrean();
+        }
+
+        function hentikanSuara() {
+            if (sedangProses) {
+                batalPaksa = true;
+                window.speechSynthesis.cancel();
+                tampilkanNotif("Suara dihentikan", "ph-stop-circle");
+            }
         }
 
         function mainkanBel() {
@@ -308,45 +400,6 @@
                     setTimeout(resolve, 2000); 
                 } catch (e) { resolve(); }
             });
-        }
-
-        function panggil(nisValue) {
-            let nis = nisValue.trim();
-            let siswa = dataSiswa[nis];
-            let inputElemen = document.getElementById("nisInput");
-
-            if (siswa) {
-                let teksBicara = "Panggilan kepada, " + siswa.nama + ", dari " + siswa.kelas + ". ditunggu di depan kantor sekretariatan.";
-                
-                antrean.push({ nis: nis, nama: siswa.nama, kelas: siswa.kelas, suara: teksBicara });
-                updateUIAntrean();
-                
-                inputElemen.value = "";
-                tampilkanNotif(`${siswa.nama} masuk antrean`, "ph-check-circle");
-                prosesAntrean();
-            } else {
-                if(nis !== "") tampilkanNotif("NIS tidak ditemukan!", "ph-warning-circle");
-                inputElemen.value = "";
-            }
-            inputElemen.focus();
-        }
-
-        document.getElementById("nisInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") panggil(this.value);
-        });
-
-        function batalkanAntrean(index) {
-            let batal = antrean.splice(index, 1);
-            tampilkanNotif("Antrean dibatalkan", "ph-trash");
-            updateUIAntrean();
-        }
-
-        function hentikanSuara() {
-            if (sedangProses) {
-                batalPaksa = true;
-                window.speechSynthesis.cancel();
-                tampilkanNotif("Suara dihentikan", "ph-stop-circle");
-            }
         }
 
         function setupSuara(utterance) {
@@ -406,6 +459,7 @@
 
                 suara1.onend = function() {
                     if (batalPaksa) { selesaikanSuara(); return; }
+                    // Jeda 1 detik lalu ulangi (berlaku untuk nama siswa & pengumuman khusus)
                     setTimeout(() => {
                         if (batalPaksa) { selesaikanSuara(); return; }
                         window.speechSynthesis.speak(suara2);
@@ -433,9 +487,9 @@
                 li.innerHTML = `
                     <div class="info-siswa">
                         <span class="nama-siswa">${a.nama}</span>
-                        <span class="detail-siswa">NIS: ${a.nis} &bull; ${a.kelas}</span>
+                        <span class="detail-siswa">${a.kelas !== 'Pengumuman' ? 'NIS: '+a.nis+' &bull;' : ''} ${a.kelas}</span>
                     </div>
-                    <button class="btn-batal" onclick="batalkanAntrean(${index})" title="Hapus dari antrean">
+                    <button class="btn-batal" onclick="batalkanAntrean(${index})" title="Hapus">
                         <i class="ph-bold ph-x"></i>
                     </button>
                 `;
@@ -456,7 +510,7 @@
                 li.innerHTML = `
                     <div class="info-siswa">
                         <span class="nama-siswa">${r.nama}</span>
-                        <span class="detail-siswa">NIS: ${r.nis} &bull; ${r.kelas}</span>
+                        <span class="detail-siswa">${r.kelas !== 'Pengumuman' ? 'NIS: '+r.nis+' &bull;' : ''} ${r.kelas}</span>
                     </div>
                     <i class="ph-bold ph-check" style="color: var(--success); margin-right: 5px;"></i>
                 `;
