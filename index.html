@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Panggilan Jemput Siswa</title>
-    <!-- Menggunakan font dari Google -->
+    <title>Sistem Panggilan Jemput Siswa v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Desain Tampilan (UI) */
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { 
             background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
@@ -16,7 +14,7 @@
             justify-content: center; align-items: center; padding: 20px;
         }
         .card {
-            background: white; width: 100%; max-width: 550px;
+            background: white; width: 100%; max-width: 600px;
             padding: 30px; border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;
         }
@@ -25,34 +23,54 @@
         
         #status-box {
             padding: 10px; border-radius: 8px; font-weight: 600; margin-bottom: 20px;
-            background: #fff3cd; color: #856404; font-size: 14px; border: 1px solid #ffeeba;
+            font-size: 14px; border: 1px solid #ffeeba; background: #fff3cd; color: #856404;
         }
         .status-sukses { background: #d4edda !important; color: #155724 !important; border-color: #c3e6cb !important; }
-        .status-gagal { background: #f8d7da !important; color: #721c24 !important; border-color: #f5c6cb !important; }
 
-        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; }
+        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
         input {
             width: 70%; padding: 15px; font-size: 18px; text-align: center;
             border: 2px solid #ddd; border-radius: 10px; transition: 0.3s;
         }
-        input:focus { border-color: #74ebd5; outline: none; box-shadow: 0 0 8px rgba(116, 235, 213, 0.4); }
-        button {
-            background: #4facfe; color: white; border: none; padding: 15px 25px;
-            font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover:not(:disabled) { background: #00f2fe; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,242,254,0.4); }
-        button:disabled { background: #cccccc; cursor: not-allowed; }
+        input:focus { border-color: #74ebd5; outline: none; }
+        
+        .btn-utama { background: #4facfe; color: white; border: none; padding: 15px 25px; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-utama:hover:not(:disabled) { background: #00f2fe; transform: translateY(-2px); }
+        .btn-stop { background: #ff4d4f; margin-bottom: 25px; padding: 10px 20px; font-size: 14px; width: 100%; }
+        .btn-stop:hover { background: #ff7875; }
 
-        .queue-container { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 15px; }
-        h3 { margin-top: 0; color: #4facfe; font-size: 18px; }
+        .container-bawah { display: flex; gap: 15px; text-align: left; margin-top: 10px; }
+        .box-list { flex: 1; background: #f8f9fa; padding: 15px; border-radius: 15px; height: 250px; overflow-y: auto; }
+        h3 { margin-top: 0; font-size: 16px; margin-bottom: 10px; }
+        .judul-antrean { color: #4facfe; }
+        .judul-riwayat { color: #28a745; }
+        
         ul { list-style: none; padding: 0; margin: 0; }
         li {
-            background: white; padding: 12px 15px; margin-bottom: 10px;
-            border-radius: 8px; border-left: 5px solid #4facfe;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease-in;
+            background: white; padding: 10px 12px; margin-bottom: 8px;
+            border-radius: 8px; font-size: 13px; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .li-antrean { border-left: 4px solid #4facfe; }
+        .li-riwayat { border-left: 4px solid #28a745; color: #666; }
+        
+        .btn-batal { background: #ff4d4f; color: white; border: none; border-radius: 5px; padding: 5px 8px; cursor: pointer; font-size: 12px; }
+        .btn-batal:hover { background: #ff7875; }
+
+        /* Custom Notifikasi (Toast) */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #ff4d4f; color: white;
+            text-align: center; border-radius: 8px; padding: 15px; position: fixed;
+            z-index: 100; left: 50%; bottom: 30px; transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, visibility 0.3s;
+            font-weight: 600;
+        }
+        #toast.show { visibility: visible; opacity: 1; }
+        
+        /* Scrollbar kustom */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -61,47 +79,58 @@
         <h2>📢 Sistem Pemanggil Siswa</h2>
         <p class="subtitle">Ketik NIS siswa untuk memanggil otomatis</p>
 
-        <!-- Kotak Status Koneksi -->
-        <div id="status-box">🔄 Sedang menghubungkan ke Google Sheets...</div>
+        <div id="status-box">🔄 Menghubungkan ke Google Sheets...</div>
         
         <div class="input-group">
             <input type="text" id="nisInput" placeholder="Contoh: 101" autocomplete="off">
-            <button id="btnPanggil" onclick="panggil()" disabled>Panggil</button>
+            <button class="btn-utama" id="btnPanggil" onclick="panggil()" disabled>Panggil</button>
         </div>
         
-        <div class="queue-container">
-            <h3>Daftar Antrean:</h3>
-            <ul id="daftarAntrean">
-                <li style="border-left-color: #ddd; color: #999;">Belum ada antrean...</li>
-            </ul>
+        <button class="btn-utama btn-stop" onclick="hentikanSuara()">🛑 Hentikan Suara Saat Ini</button>
+        
+        <div class="container-bawah">
+            <div class="box-list">
+                <h3 class="judul-antrean">Daftar Antrean</h3>
+                <ul id="daftarAntrean"><li style="color: #999;">Kosong...</li></ul>
+            </div>
+            <div class="box-list">
+                <h3 class="judul-riwayat">Riwayat (Selesai)</h3>
+                <ul id="daftarRiwayat"><li style="color: #999;">Belum ada...</li></ul>
+            </div>
         </div>
     </div>
 
+    <!-- Elemen Notifikasi Pop-up -->
+    <div id="toast">Notifikasi</div>
+
     <script>
         // =========================================================================
-        // WAJIB GANTI TEKS DI BAWAH INI DENGAN LINK GOOGLE SHEETS MILIK ANDA
+        // LINK GOOGLE SHEETS SUDAH OTOMATIS TERPASANG DI BAWAH INI
         // =========================================================================
         const urlGoogleSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnDyG3NAgbwsdmq_T47f_iXMjBeOT4EXVLEhjwarsaWd-ZQtjprjoJUKh3yeau7LO-bgAZgLXivQKh/pub?gid=0&single=true&output=csv";
         
         let dataSiswa = {}; 
         let antrean = [];
+        let riwayat = [];
         let sedangProses = false;
 
-        // 1. FUNGSI MENGAMBIL DATA (Dengan Sistem Pengecekan Eror)
+        // FUNGSI NOTIFIKASI CUSTOM
+        function tampilkanNotif(pesan) {
+            let toast = document.getElementById("toast");
+            toast.innerText = pesan;
+            toast.classList.add("show");
+            setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+        }
+
         async function ambilDataSiswa() {
             const statusBox = document.getElementById("status-box");
-            
-            // Cek apakah link sudah diganti atau belum
             if (urlGoogleSheets.includes("MASUKKAN_LINK_CSV")) {
-                statusBox.innerText = "❌ ERROR: Link Google Sheets belum diganti di dalam kode!";
-                statusBox.className = "status-gagal";
+                statusBox.innerText = "❌ ERROR: Link Google Sheets belum diganti!";
                 return;
             }
-
             try {
                 const response = await fetch(urlGoogleSheets);
-                if (!response.ok) throw new Error("Gagal mengunduh CSV");
-                
+                if (!response.ok) throw new Error("Gagal");
                 const dataText = await response.text();
                 const baris = dataText.split('\n');
                 
@@ -109,118 +138,159 @@
                     let kolom = baris[i].split(','); 
                     if (kolom.length >= 3) {
                         let nis = kolom[0].trim();
-                        let nama = kolom[1].trim();
-                        let kelas = kolom[2].trim();
-                        if(nis !== "") dataSiswa[nis] = nama + ", dari kelas " + kelas;
+                        if(nis !== "") dataSiswa[nis] = kolom[1].trim() + ", dari kelas " + kolom[2].trim();
                     }
                 }
-                
-                statusBox.innerText = "✅ Tersambung! Database siap digunakan.";
+                statusBox.innerText = "✅ Database terhubung! Siap digunakan.";
                 statusBox.className = "status-sukses";
                 document.getElementById("btnPanggil").disabled = false;
             } catch (error) {
-                statusBox.innerText = "❌ Gagal koneksi! Pastikan link benar dan internet aktif.";
-                statusBox.className = "status-gagal";
+                statusBox.innerText = "❌ Gagal koneksi! Periksa link internet.";
             }
         }
-
-        // Panggil data saat halaman dimuat
         ambilDataSiswa();
 
-        // 2. FUNGSI MEMBUAT SUARA BEL "TING-NONG"
         function mainkanBel() {
             return new Promise((resolve) => {
                 try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    const ctx = new AudioContext();
-                    
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
                     const mainkanNada = (frekuensi, waktuMulai, durasi) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.type = 'sine'; // Suara jernih seperti bel
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.type = 'sine';
                         osc.frequency.setValueAtTime(frekuensi, ctx.currentTime + waktuMulai);
                         gain.gain.setValueAtTime(0.6, ctx.currentTime + waktuMulai);
                         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + waktuMulai + durasi);
                         osc.start(ctx.currentTime + waktuMulai);
                         osc.stop(ctx.currentTime + waktuMulai + durasi);
                     };
-
-                    // Nada "Ting" (tinggi) lalu "Nong" (rendah)
-                    mainkanNada(783.99, 0, 1.2); // G5
-                    mainkanNada(523.25, 0.6, 1.5); // C5
-                    
-                    // Tunggu 2 detik agar bel selesai sebelum robot berbicara
+                    mainkanNada(783.99, 0, 1.2); 
+                    mainkanNada(523.25, 0.6, 1.5); 
                     setTimeout(resolve, 2000); 
-                } catch (e) {
-                    resolve(); // Jika browser tidak mendukung, langsung ngomong saja
-                }
+                } catch (e) { resolve(); }
             });
         }
 
-        // 3. FUNGSI MEMASUKKAN KE ANTREAN
         function panggil() {
             let inputElemen = document.getElementById("nisInput");
             let nis = inputElemen.value.trim();
             let infoSiswa = dataSiswa[nis];
 
             if (infoSiswa) {
-                let teks = "Panggilan ditujukan kepada, " + infoSiswa + ". ditunggu di depan kantor sekretariatan";
-                antrean.push(teks);
+                let namaTampil = infoSiswa.split(",")[0]; // Ambil nama saja untuk di layar
+                let teksBicara = "Panggilan ditujukan kepada, " + infoSiswa + ". Penjemput telah tiba.";
+                
+                // Simpan objek ke antrean (teks untuk robot, nama untuk UI)
+                antrean.push({ suara: teksBicara, layar: namaTampil });
                 updateUIAntrean();
                 inputElemen.value = "";
-                inputElemen.focus(); // Kembalikan kursor ke kotak ketik
+                inputElemen.focus();
                 prosesAntrean();
             } else {
-                alert("NIS " + nis + " tidak ditemukan!");
+                tampilkanNotif("⚠️ NIS " + nis + " tidak ditemukan!");
                 inputElemen.value = "";
+                inputElemen.focus();
             }
         }
 
-        // Jalankan fungsi panggil jika tombol Enter ditekan
         document.getElementById("nisInput").addEventListener("keypress", function(event) {
             if (event.key === "Enter") panggil();
         });
 
-        // 4. FUNGSI MEMPROSES ANTREAN & SUARA
+        // FUNGSI MEMBATALKAN 1 ANTREAN
+        function batalkanAntrean(index) {
+            let batal = antrean.splice(index, 1);
+            tampilkanNotif("❌ " + batal[0].layar + " dihapus dari antrean.");
+            updateUIAntrean();
+        }
+
+        // FUNGSI MENGHENTIKAN SUARA PAKSA
+        function hentikanSuara() {
+            window.speechSynthesis.cancel();
+            sedangProses = false;
+            tampilkanNotif("🛑 Suara dihentikan!");
+            // Jika masih ada sisa antrean, otomatis lanjut ke orang berikutnya dalam 1 detik
+            if(antrean.length > 0) {
+                setTimeout(prosesAntrean, 1000);
+            }
+        }
+
         async function prosesAntrean() {
             if (antrean.length > 0 && !sedangProses) {
                 sedangProses = true;
                 
-                // Bunyikan bel dulu dan tunggu sampai selesai
                 await mainkanBel(); 
+                
+                // Cek lagi apakah antrean tidak dihapus saat bel bunyi
+                if(antrean.length === 0) { sedangProses = false; return; }
 
-                // Setelah bel selesai, baru robot membaca nama
-                let teks = antrean[0]; 
-                let suara = new SpeechSynthesisUtterance(teks);
+                let dataSaatIni = antrean[0]; 
+                let suara = new SpeechSynthesisUtterance(dataSaatIni.suara);
                 suara.lang = 'id-ID'; 
-                suara.rate = 0.85; // Sedikit diperlambat agar terdengar jelas
-                suara.pitch = 1.1; // Nada suara
+                suara.rate = 0.85;
 
                 suara.onend = function() {
-                    antrean.shift(); // Hapus dari daftar antrean
+                    let selesai = antrean.shift(); 
+                    
+                    // Masukkan ke riwayat (maksimal 10)
+                    if(selesai) {
+                        riwayat.unshift(selesai.layar); 
+                        if(riwayat.length > 10) riwayat.pop();
+                        updateUIRiwayat();
+                    }
+
                     sedangProses = false;
                     updateUIAntrean();
-                    prosesAntrean(); // Lanjut ke antrean berikutnya jika ada
+                    prosesAntrean(); 
                 };
+                
+                // Antisipasi error terpotong di Chrome
+                suara.onerror = function() {
+                    sedangProses = false;
+                    prosesAntrean();
+                }
 
                 window.speechSynthesis.speak(suara);
             }
         }
 
-        // 5. UPDATE TAMPILAN ANTREAN
         function updateUIAntrean() {
             let list = document.getElementById("daftarAntrean");
             list.innerHTML = "";
             if(antrean.length === 0) {
-                list.innerHTML = '<li style="border-left-color: #ddd; color: #999;">Antrean kosong...</li>';
+                list.innerHTML = '<li style="color: #999;">Antrean kosong...</li>';
                 return;
             }
-            antrean.forEach(a => {
+            antrean.forEach((a, index) => {
                 let li = document.createElement("li");
-                // Memotong kalimat teks agar di layar hanya tampil "Panggilan untuk [Nama]..."
-                li.innerText = a.replace(". ditunggu di depan kantor sekretarian", "");
+                li.className = "li-antrean";
+                
+                let span = document.createElement("span");
+                span.innerText = (index + 1) + ". " + a.layar;
+                
+                let btn = document.createElement("button");
+                btn.className = "btn-batal";
+                btn.innerText = "Batal";
+                btn.onclick = () => batalkanAntrean(index);
+                
+                li.appendChild(span);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+
+        function updateUIRiwayat() {
+            let list = document.getElementById("daftarRiwayat");
+            list.innerHTML = "";
+            if(riwayat.length === 0) {
+                list.innerHTML = '<li style="color: #999;">Belum ada...</li>';
+                return;
+            }
+            riwayat.forEach((nama) => {
+                let li = document.createElement("li");
+                li.className = "li-riwayat";
+                li.innerText = "✓ " + nama;
                 list.appendChild(li);
             });
         }
