@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Panggilan Jemput Siswa v4</title>
+    <title>Sistem Panggilan Jemput Siswa v5</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -55,7 +55,6 @@
         .li-antrean { border-left: 4px solid #4facfe; }
         .li-riwayat { border-left: 4px solid #28a745; opacity: 0.8; }
         
-        /* Gaya baru untuk teks identitas siswa yang lebih rapi */
         .info-siswa { display: flex; flex-direction: column; flex: 1; text-align: left; margin-right: 10px; line-height: 1.4; }
         .nama-siswa { font-weight: 600; font-size: 13px; color: #333; }
         .detail-siswa { font-size: 11px; color: #666; }
@@ -114,6 +113,12 @@
         let sedangProses = false;
         let batalPaksa = false; 
 
+        // PENYIMPANAN SUARA DARI BROWSER
+        let daftarSuara = [];
+        window.speechSynthesis.onvoiceschanged = function() {
+            daftarSuara = window.speechSynthesis.getVoices();
+        };
+
         function tampilkanNotif(pesan) {
             let toast = document.getElementById("toast");
             toast.innerText = pesan;
@@ -137,7 +142,6 @@
                         let kelas = kolom[2].trim();
                         
                         if(nis !== "") {
-                            // Data sekarang disimpan lebih terstruktur
                             dataSiswa[nis] = { nama: nama, kelas: kelas };
                         }
                     }
@@ -145,6 +149,9 @@
                 statusBox.innerText = "✅ Database terhubung! Siap digunakan.";
                 statusBox.className = "status-sukses";
                 document.getElementById("btnPanggil").disabled = false;
+                
+                // Panggil sekali agar daftar suara di-load
+                daftarSuara = window.speechSynthesis.getVoices();
             } catch (error) {
                 statusBox.innerText = "❌ Gagal koneksi! Periksa link internet.";
             }
@@ -179,9 +186,9 @@
             let siswa = dataSiswa[nis];
 
             if (siswa) {
-                let teksBicara = "Panggilan ditujukan kepada, " + siswa.nama + ", dari kelas " + siswa.kelas + ". Penjemput telah tiba.";
+                // TEKS PANGGILAN TERBARU
+                let teksBicara = "Panggilan kepada, " + siswa.nama + ", dari " + siswa.kelas + ". ditunggu di depan kantor sekretariatan.";
                 
-                // Masukkan data lengkap ke antrean
                 antrean.push({ 
                     nis: nis, 
                     nama: siswa.nama, 
@@ -218,6 +225,28 @@
             }
         }
 
+        // FUNGSI UNTUK MEMILIH SUARA TERBAIK
+        function setupSuara(utterance) {
+            utterance.lang = 'id-ID'; 
+            utterance.rate = 0.85; 
+            
+            if (daftarSuara.length > 0) {
+                // Mencari suara Microsoft Gadis (Edge), Ayu, Damayanti (Mac) agar lebih natural
+                let suaraPilihan = daftarSuara.find(v => 
+                    (v.name.includes("Gadis") || v.name.includes("Natural") || v.name.includes("Ayu") || v.name.includes("Damayanti")) && v.lang.includes("id")
+                );
+                
+                if(!suaraPilihan) {
+                    // Kalau tidak ada, cari suara bahasa Indonesia apapun
+                    suaraPilihan = daftarSuara.find(v => v.lang === 'id-ID');
+                }
+
+                if (suaraPilihan) {
+                    utterance.voice = suaraPilihan;
+                }
+            }
+        }
+
         async function prosesAntrean() {
             if (antrean.length > 0 && !sedangProses) {
                 sedangProses = true;
@@ -234,9 +263,13 @@
                 }
 
                 let dataSaatIni = antrean[0]; 
-                let suara = new SpeechSynthesisUtterance(dataSaatIni.suara);
-                suara.lang = 'id-ID'; 
-                suara.rate = 0.85;
+                
+                // Buat 2 objek suara untuk diucapkan 2 kali
+                let suara1 = new SpeechSynthesisUtterance(dataSaatIni.suara);
+                let suara2 = new SpeechSynthesisUtterance(dataSaatIni.suara);
+                
+                setupSuara(suara1);
+                setupSuara(suara2);
 
                 let sudahSelesai = false;
 
@@ -265,10 +298,31 @@
                     setTimeout(prosesAntrean, 500); 
                 }
 
-                suara.onend = selesaikanSuara;
-                suara.onerror = selesaikanSuara; 
+                // Setelah panggilan pertama selesai
+                suara1.onend = function() {
+                    if (batalPaksa) {
+                        selesaikanSuara();
+                        return;
+                    }
+                    
+                    // Jeda 1 detik (1000 milidetik), lalu panggil panggilan kedua
+                    setTimeout(() => {
+                        if (batalPaksa) {
+                            selesaikanSuara();
+                            return;
+                        }
+                        window.speechSynthesis.speak(suara2);
+                    }, 1000); 
+                };
 
-                window.speechSynthesis.speak(suara);
+                // Setelah panggilan kedua selesai
+                suara2.onend = selesaikanSuara;
+                
+                suara1.onerror = selesaikanSuara; 
+                suara2.onerror = selesaikanSuara; 
+
+                // Mulai panggilan pertama
+                window.speechSynthesis.speak(suara1);
             }
         }
 
@@ -283,7 +337,6 @@
                 let li = document.createElement("li");
                 li.className = "li-antrean";
                 
-                // Membuat kotak info yang rapi (Nama tebal, NIS & Kelas di bawahnya)
                 let divInfo = document.createElement("div");
                 divInfo.className = "info-siswa";
                 divInfo.innerHTML = `
