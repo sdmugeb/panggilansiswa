@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            --primary: #1e3a8a; /* Biru Dongker Elegan */
+            --primary: #1e3a8a; 
             --primary-hover: #1e40af;
             --accent: #3b82f6; 
             --card-bg: #ffffff;
@@ -25,7 +25,6 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         
         body { 
-            /* Gradasi latar belakang yang elegan */
             background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 50%, #dbeafe 100%);
             min-height: 100vh; display: flex;
             justify-content: center; align-items: center; padding: 20px;
@@ -44,11 +43,11 @@
         .school-name { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 5px; }
         .school-subtitle { font-size: 13px; font-weight: 400; opacity: 0.9; }
 
-        .card-body { padding: 35px; }
+        .card-body { padding: 30px 35px; }
 
         #status-box {
             display: flex; align-items: center; gap: 10px;
-            padding: 12px 15px; border-radius: 8px; font-weight: 500; margin-bottom: 25px;
+            padding: 12px 15px; border-radius: 8px; font-weight: 500; margin-bottom: 20px;
             font-size: 13px; border: 1px solid var(--border); background: #f8fafc; color: var(--text-muted);
         }
         .status-sukses { background: #ecfdf5 !important; color: var(--success) !important; border-color: #a7f3d0 !important; }
@@ -58,13 +57,12 @@
         .input-box label { font-size: 13px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
         
         .input-wrapper { display: flex; gap: 8px; position: relative; }
-        .input-wrapper input {
-            width: 100%; padding: 12px 15px; font-size: 15px;
+        .input-wrapper input, select {
+            width: 100%; padding: 12px 15px; font-size: 14px;
             border: 1px solid var(--border); border-radius: 8px; transition: 0.2s; background: #f8fafc;
         }
-        .input-wrapper input:focus { border-color: var(--accent); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .input-wrapper input:focus, select:focus { border-color: var(--accent); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
-        /* Dropdown Hasil Pencarian (NIS & Nama) */
         .search-results {
             position: absolute; top: 100%; left: 0; right: 0; margin-top: 5px;
             background: white; border: 1px solid var(--border); border-radius: 8px;
@@ -81,14 +79,18 @@
         .search-detail { font-size: 12px; color: var(--text-muted); }
         .btn-add { background: #e0e7ff; color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; pointer-events: none; }
 
-        /* Tombol Pengumuman Khusus */
-        .pengumuman-section { margin-bottom: 25px; border: 1px solid var(--border); padding: 15px; border-radius: 12px; background: #fafafa;}
-        .pengumuman-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .pengaturan-suara { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .slider-group { display: flex; gap: 20px; margin-top: 10px; }
+        .slider-box { flex: 1; display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+        .slider-box input[type="range"] { width: 100%; cursor: pointer; }
+
+        .pengumuman-section { margin-bottom: 20px; border: 1px solid var(--border); padding: 15px; border-radius: 12px; background: #fafafa;}
+        .section-title { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .pengumuman-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .btn-pengumuman {
             background: white; border: 1px solid var(--border); color: var(--text-main);
             padding: 10px; font-size: 12px; font-weight: 500; border-radius: 8px; cursor: pointer;
-            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px;
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center;
         }
         .btn-pengumuman i { font-size: 20px; color: var(--accent); }
         .btn-pengumuman:hover { border-color: var(--accent); background: #eff6ff; }
@@ -96,12 +98,12 @@
         .btn-stop {
             width: 100%; background: #fee2e2; color: var(--danger); border: 1px solid #fecaca;
             padding: 12px; font-size: 14px; font-weight: 600; border-radius: 8px;
-            cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 25px;
+            cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px;
         }
         .btn-stop:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
         .container-bawah { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .box-list { border: 1px solid var(--border); border-radius: 12px; height: 300px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column;}
+        .box-list { border: 1px solid var(--border); border-radius: 12px; height: 250px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column;}
         .box-header { 
             padding: 15px; border-bottom: 1px solid var(--border); background: white;
             position: sticky; top: 0; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--text-main);
@@ -123,7 +125,6 @@
         }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* Modal Peringatan NIS Ganda */
         #modal-warning {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 20px;
@@ -132,8 +133,6 @@
             background: white; padding: 25px; border-radius: 12px; max-width: 450px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
         .modal-content i { font-size: 40px; color: var(--warning); margin-bottom: 15px; }
-        .modal-content h3 { color: var(--text-main); margin-bottom: 10px; }
-        .modal-content p { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: left; background: #f8fafc; padding: 10px; border-radius: 8px; max-height: 150px; overflow-y: auto;}
         .btn-tutup-modal { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
         
         ::-webkit-scrollbar { width: 6px; }
@@ -141,8 +140,7 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
         @media (max-width: 650px) {
-            .input-section { grid-template-columns: 1fr; gap: 15px; }
-            .container-bawah { grid-template-columns: 1fr; }
+            .input-section, .container-bawah { grid-template-columns: 1fr; }
             .pengumuman-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
@@ -159,9 +157,26 @@
             <div id="status-box">
                 <i class="ph ph-spinner ph-spin"></i> Menghubungkan ke Database Sheets...
             </div>
+
+            <!-- SETTING SUARA MANUAL -->
+            <div class="pengaturan-suara">
+                <div class="section-title"><i class="ph-fill ph-speaker-hifi"></i> Pengaturan Suara</div>
+                <select id="voiceSelect">
+                    <option value="">Memuat daftar suara...</option>
+                </select>
+                <div class="slider-group">
+                    <div class="slider-box">
+                        <label>Kecepatan: <span id="rateValue">0.85</span></label>
+                        <input type="range" id="rateSlider" min="0.5" max="1.5" step="0.05" value="0.85">
+                    </div>
+                    <div class="slider-box">
+                        <label>Nada (Pitch): <span id="pitchValue">1.0</span></label>
+                        <input type="range" id="pitchSlider" min="0.5" max="1.5" step="0.1" value="1.0">
+                    </div>
+                </div>
+            </div>
             
             <div class="input-section">
-                <!-- Pencarian NIS -->
                 <div class="input-box">
                     <label><i class="ph-fill ph-identification-card"></i> Panggil via NIS</label>
                     <div class="input-wrapper">
@@ -170,7 +185,6 @@
                     </div>
                 </div>
 
-                <!-- Pencarian Nama -->
                 <div class="input-box">
                     <label><i class="ph-fill ph-user-list"></i> Cari Nama Siswa</label>
                     <div class="input-wrapper">
@@ -180,9 +194,8 @@
                 </div>
             </div>
 
-            <!-- Tombol Pengumuman Khusus -->
             <div class="pengumuman-section">
-                <div class="pengumuman-title"><i class="ph-fill ph-megaphone"></i> Pengumuman Khusus</div>
+                <div class="section-title"><i class="ph-fill ph-megaphone"></i> Pengumuman Khusus</div>
                 <div class="pengumuman-grid">
                     <button class="btn-pengumuman" onclick="panggilPengumuman('Pengumuman. Kepada seluruh siswa yang telah selesai mengikuti kegiatan OST, dimohon untuk segera berkumpul di depan kantor kesekretariatan. Terima kasih.', 'Pengumuman OST')">
                         <i class="ph-fill ph-users-three"></i> Siswa OST
@@ -216,15 +229,14 @@
         </div>
     </div>
 
-    <!-- Toast & Modal -->
     <div id="toast"><i class="ph-fill ph-info"></i> <span id="toast-msg">Notifikasi</span></div>
     
     <div id="modal-warning">
         <div class="modal-content">
             <i class="ph-fill ph-warning-circle"></i>
-            <h3>Peringatan Data Ganda</h3>
-            <div style="font-size: 13px; margin-bottom: 10px;">Ditemukan NIS yang sama digunakan oleh siswa yang berbeda di Spreadsheet. Harap segera perbaiki data Anda:</div>
-            <p id="modal-warning-text"></p>
+            <h3 style="color: #0f172a; margin-bottom: 10px;">Peringatan Data Ganda</h3>
+            <div style="font-size: 13px; margin-bottom: 10px; color: #64748b;">Ditemukan NIS yang sama digunakan oleh siswa yang berbeda di Spreadsheet. Harap segera perbaiki data Anda:</div>
+            <p id="modal-warning-text" style="font-size: 13px; color: #64748b; text-align: left; background: #f8fafc; padding: 10px; border-radius: 8px; max-height: 150px; overflow-y: auto; margin-bottom: 15px;"></p>
             <button class="btn-tutup-modal" onclick="document.getElementById('modal-warning').style.display='none'">Saya Mengerti</button>
         </div>
     </div>
@@ -237,11 +249,55 @@
         let riwayat = [];
         let sedangProses = false;
         let batalPaksa = false; 
-
         let daftarSuara = [];
-        window.speechSynthesis.onvoiceschanged = function() {
+
+        // FUNGSI MEMUAT DAFTAR SUARA KE DROPDOWN
+        function muatDaftarSuara() {
             daftarSuara = window.speechSynthesis.getVoices();
-        };
+            let voiceSelect = document.getElementById("voiceSelect");
+            voiceSelect.innerHTML = "";
+            
+            let idVoices = [];
+            let otherVoices = [];
+            
+            daftarSuara.forEach((voice, index) => {
+                let option = document.createElement("option");
+                option.value = index;
+                // Tandai rekomendasi untuk suara natural
+                let isNatural = voice.name.includes("Gadis") || voice.name.includes("Natural") || voice.name.includes("Ayu") || voice.name.includes("Online");
+                option.textContent = voice.name + (isNatural ? " (⭐ Rekomendasi)" : "");
+                
+                if (voice.lang.includes("id")) {
+                    idVoices.push(option);
+                    // Jadikan suara natural sebagai default jika ditemukan
+                    if (isNatural) option.selected = true;
+                } else {
+                    otherVoices.push(option);
+                }
+            });
+
+            // Tampilkan suara Indonesia di paling atas
+            idVoices.forEach(opt => voiceSelect.appendChild(opt));
+            
+            // Beri garis pembatas
+            if(idVoices.length > 0 && otherVoices.length > 0) {
+                let separator = document.createElement("option");
+                separator.disabled = true;
+                separator.textContent = "--- Suara Bahasa Lainnya ---";
+                voiceSelect.appendChild(separator);
+            }
+            
+            otherVoices.forEach(opt => voiceSelect.appendChild(opt));
+        }
+
+        // Trigger saat browser berhasil memuat suara
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = muatDaftarSuara;
+        }
+
+        // UPDATE SLIDER TEXT
+        document.getElementById("rateSlider").oninput = function() { document.getElementById("rateValue").innerText = this.value; }
+        document.getElementById("pitchSlider").oninput = function() { document.getElementById("pitchValue").innerText = this.value; }
 
         function tampilkanNotif(pesan, icon = "ph-info") {
             let toast = document.getElementById("toast");
@@ -268,7 +324,6 @@
                         let kelas = kolom[2].trim();
                         
                         if(nis !== "") {
-                            // Cek jika NIS sudah ada tapi namanya beda (Data ganda/konflik)
                             if(dataSiswa[nis] && dataSiswa[nis].nama.toLowerCase() !== nama.toLowerCase()) {
                                 warningGanda.push(`&bull; NIS <b>${nis}</b>: dipakai oleh <b>${dataSiswa[nis].nama}</b> & <b>${nama}</b>`);
                             }
@@ -279,13 +334,13 @@
                 statusBox.innerHTML = `<i class="ph-fill ph-check-circle"></i> Database Terhubung (${Object.keys(dataSiswa).length} Data)`;
                 statusBox.className = "status-sukses";
                 
-                // Jika ada data ganda, tampilkan pop up modal
                 if(warningGanda.length > 0) {
                     document.getElementById('modal-warning-text').innerHTML = warningGanda.join('<br><br>');
                     document.getElementById('modal-warning').style.display = 'flex';
                 }
                 
-                daftarSuara = window.speechSynthesis.getVoices();
+                // Panggil manual jika onvoiceschanged tidak jalan otomatis
+                setTimeout(muatDaftarSuara, 500);
             } catch (error) {
                 statusBox.innerHTML = `<i class="ph-fill ph-warning-circle"></i> Gagal koneksi ke database.`;
                 statusBox.style.color = "var(--danger)";
@@ -293,7 +348,6 @@
         }
         ambilDataSiswa();
 
-        // LOGIKA PENCARIAN (Bisa dipakai untuk NIS dan Nama)
         function setupPencarian(inputId, resultsId, tipePencarian) {
             document.getElementById(inputId).addEventListener("input", function() {
                 let keyword = this.value.toLowerCase().trim();
@@ -338,13 +392,11 @@
         setupPencarian("nisInput", "nisResults", "nis");
         setupPencarian("searchInput", "searchResults", "nama");
 
-        // Menutup dropdown jika klik di luar
         document.addEventListener('click', function(e) {
             if (!document.getElementById("nisInput").contains(e.target)) document.getElementById("nisResults").style.display = "none";
             if (!document.getElementById("searchInput").contains(e.target)) document.getElementById("searchResults").style.display = "none";
         });
 
-        // FUNGSI MEMASUKKAN SISWA KE ANTREAN
         function masukkanKeAntrean(nisValue) {
             let nis = nisValue.trim();
             let siswa = dataSiswa[nis];
@@ -358,7 +410,6 @@
             }
         }
 
-        // FUNGSI MEMASUKKAN PENGUMUMAN KHUSUS KE ANTREAN
         function panggilPengumuman(teks, label) {
             antrean.push({ nis: "-", nama: label, kelas: "Pengumuman", suara: teks });
             updateUIAntrean();
@@ -402,15 +453,15 @@
             });
         }
 
+        // SETUP SUARA BERDASARKAN PILIHAN SLIDER & DROPDOWN
         function setupSuara(utterance) {
             utterance.lang = 'id-ID'; 
-            utterance.rate = 0.85; 
-            if (daftarSuara.length > 0) {
-                let suaraPilihan = daftarSuara.find(v => 
-                    (v.name.includes("Gadis") || v.name.includes("Natural") || v.name.includes("Ayu") || v.name.includes("Damayanti")) && v.lang.includes("id")
-                );
-                if(!suaraPilihan) suaraPilihan = daftarSuara.find(v => v.lang === 'id-ID');
-                if (suaraPilihan) utterance.voice = suaraPilihan;
+            utterance.rate = parseFloat(document.getElementById("rateSlider").value);
+            utterance.pitch = parseFloat(document.getElementById("pitchSlider").value);
+            
+            let selectedVoiceIndex = document.getElementById("voiceSelect").value;
+            if (selectedVoiceIndex !== "" && daftarSuara[selectedVoiceIndex]) {
+                utterance.voice = daftarSuara[selectedVoiceIndex];
             }
         }
 
@@ -459,7 +510,6 @@
 
                 suara1.onend = function() {
                     if (batalPaksa) { selesaikanSuara(); return; }
-                    // Jeda 1 detik lalu ulangi (berlaku untuk nama siswa & pengumuman khusus)
                     setTimeout(() => {
                         if (batalPaksa) { selesaikanSuara(); return; }
                         window.speechSynthesis.speak(suara2);
